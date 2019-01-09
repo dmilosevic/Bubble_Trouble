@@ -1,15 +1,16 @@
 import sys
 
-from PyQt5.QtCore import Qt, QSize, QBasicTimer,QRect, QRectF
-from PyQt5.QtGui import QPixmap, QPalette, QBrush, QImage, QPainter, QPen, QFont,QPainterPath,QRegion
-from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QVBoxLayout, QHBoxLayout, QGroupBox
-from settings import *
+from PyQt5.QtCore import Qt, QSize, QBasicTimer
+from PyQt5.QtGui import QPixmap, QPalette, QBrush, QImage, QFont
+from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QVBoxLayout, QHBoxLayout
 from key_notifier import KeyNotifier
 from Player import Player
 from Ball import Ball
+from Bonus import *
 import time
+import random
 from settings import *
-import os
+
 
 class SimMoveDemo(QWidget):
 
@@ -17,9 +18,10 @@ class SimMoveDemo(QWidget):
         super().__init__()
 
         self.currentAmp = AMPLITUDE
-        self.startingBallSize = 60
+        self.startingBallSize = 180
         self.setGeometry(600, 200, WINDOWWIDTH, WINDOWHEIGHT)
         self.players = [Player(self, 'player2'), Player(self, 'player1')]
+        self.bonuses = []
         self.balls = [Ball(self, self.startingBallSize)]
         self.__init_ui__()
         self.key_notifier = KeyNotifier()
@@ -42,19 +44,20 @@ class SimMoveDemo(QWidget):
             ball.ball.setGeometry(ball.x, ball.y, ball.size, ball.size)
         self.players[0].show()
         self.players[1].show()
+
     def __init_ui__(self):
         self.initPlayersAndBalls()
         self.setWindowTitle('Bubble Trouble')
         self.stopOnStart = True
-        #BACKGROUND
+        # BACKGROUND
         oImage = QImage(IMAGES_DIR + 'background.png')
         sImage = oImage.scaled(QSize(WINDOWWIDTH, WINDOWHEIGHT))
         palette = QPalette()
         palette.setBrush(10, QBrush(sImage))
         self.setPalette(palette)
-        self.setWindowFlags(Qt.WindowCloseButtonHint|Qt.WindowMinimizeButtonHint)
+        self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint)
 
-        #elements
+        # elements
         self.livesPic1 = QPixmap(IMAGES_DIR + 'player1.png').scaled(20, 30)
         self.livesPic2 = QPixmap(IMAGES_DIR + 'player2.png').scaled(20, 30)
 
@@ -64,15 +67,12 @@ class SimMoveDemo(QWidget):
         horizontalBox = QHBoxLayout()
 
         for label in self.labelLivesP1:
-            horizontalBox.addWidget(label,1,Qt.AlignLeft | Qt.AlignTop)
+            horizontalBox.addWidget(label, 1, Qt.AlignLeft | Qt.AlignTop)
         horizontalBox.addSpacing(WINDOWWIDTH-2*80-75)
         for label in self.labelLivesP2:
-            horizontalBox.addWidget(label,1,Qt.AlignRight | Qt.AlignTop)
+            horizontalBox.addWidget(label, 1, Qt.AlignRight | Qt.AlignTop)
 
         self.initGuiElements(horizontalBox, verticalPlayerInf)
-
-        #self.players[0].weapon.weapon.show()
-        #self.players[1].weapon.weapon.show()
 
         self.setLayout(verticalPlayerInf)
         self.show()
@@ -84,7 +84,7 @@ class SimMoveDemo(QWidget):
             labelLives[i].setPixmap(pixMap)
         return labelLives
 
-    def updatePlayerPixMapLives(self,pixMap, currentLives, playerUpdated):
+    def updatePlayerPixMapLives(self, pixMap, currentLives, playerUpdated):
         if playerUpdated.playerId == 'player1':
             self.labelLivesP1[currentLives].clear()
         elif playerUpdated.playerId == 'player2':
@@ -162,7 +162,7 @@ class SimMoveDemo(QWidget):
         verticalLevel = QVBoxLayout()
         verticalLevel.addWidget(levelTag)
         verticalLevel.addSpacing(-9)
-        verticalLevel.addWidget(levelNumTag,0,Qt.AlignCenter)
+        verticalLevel.addWidget(levelNumTag, 0, Qt.AlignCenter)
 
         horizontalPlayerInf = QHBoxLayout()
         horizontalPlayerInf.addWidget(player1Tag)
@@ -178,7 +178,6 @@ class SimMoveDemo(QWidget):
         verticalPlayerInf.addLayout(horizontalBox)
         verticalPlayerInf.addWidget(self.getReadyLabel, 1, Qt.AlignCenter | Qt.AlignTop)
         verticalPlayerInf.addLayout(horizontalPlayerInf)
-
 
     def keyPressEvent(self, event):
         self.key_notifier.add_key(event.key())
@@ -198,11 +197,16 @@ class SimMoveDemo(QWidget):
 
     def timerEvent(self, event):
         for ball in self.balls:
-            if(self.stopOnStart):
+            if self.stopOnStart:
                 time.sleep(2)
                 self.getReadyLabel.close()
             ball.start()
             self.stopOnStart = False
+        for bonus in self.bonuses:
+            bonus.update()
+            bonus.bonus.setPixmap(bonus.pixMapScaled)
+            bonus.bonus.setGeometry(bonus.posX, bonus.posY, 30, 30)
+            bonus.bonus.show()
         self.checkCollisionWeapon()
         self.checkCollisionPlayer()
 
@@ -220,6 +224,12 @@ class SimMoveDemo(QWidget):
 
             self.balls.append(ball1)
             self.balls.append(ball2)
+
+            if random.randrange(BONUS_RANGE) == 0:
+                bonus_type = random.choice(bonus_types)
+                bonus = Bonus(self, bonus_type, x, y)
+                bonus.isActive = True
+                self.bonuses.append(bonus)
 
             ball1.splitedLeft = True
             ball2.splitedRight = True
@@ -250,21 +260,20 @@ class SimMoveDemo(QWidget):
                             self.balls.remove(ball)
                             ball.ball.hide()
                             del ball
-                            
-                            #ball.ball.setGeometry(0,0,0,0)
-                            #ball = None
+
                             self.splitBall(size, x, y)
                             player.pointsSignal.emit(50)
-                            break #unisti samo jednu lopticu i izadji (pravi bag ako se izostavi -> unistava novonastale lopte)
+                            break  # unisti samo jednu lopticu i izadji (pravi bag ako se izostavi -> unistava
+                            # novonastale lopte)
 
     def checkCollisionPlayer(self):
         for player in self.players:
             for ball in self.balls:
                 if player.PositionY <= ball.dy + ball.size-20:
                     if(ball.counter <= player.PositionX and player.PositionX <= ball.counter + ball.size) or \
-                        (ball.counter <= player.PositionX + 25 and player.PositionX + 25 <= ball.counter + ball.size) or \
-                        (ball.counter <= player.PositionX and ball.counter + ball.size >= player.PositionX + 28) or \
-                        (ball.counter >= player.PositionX and ball.counter + ball.size <= player.PositionX + 40):
+                     (ball.counter <= player.PositionX + 25 and player.PositionX + 25 <= ball.counter + ball.size) or \
+                     (ball.counter <= player.PositionX and ball.counter + ball.size >= player.PositionX + 28) or \
+                     (ball.counter >= player.PositionX and ball.counter + ball.size <= player.PositionX + 40):
                         # print('udario')
                         self.timer.stop()
                         ball.ball.hide()
@@ -273,12 +282,29 @@ class SimMoveDemo(QWidget):
                         time.sleep(1)
                         self.resetLevel()
                         player.livesSignal.emit(1)
+            for bonus in self.bonuses:
+                if (player.PositionX + player.Width >= bonus.posX and player.PositionX <= bonus.posX \
+                        and bonus.posY + bonus.height >= player.PositionY) or \
+                        (player.PositionX <= bonus.posX + bonus.width and player.PositionX >= bonus.posX and bonus.posY + bonus.height >= player.PositionY):
+
+                    if bonus.bonusType == BONUS_COINS:
+                        player.pointsSignal.emit(375)
+                    elif bonus.bonusType == BONUS_NO_WEAPON:
+                        player.weapon.isActive = False
+                        player.bonusNoWeapon = True
+                    bonus.bonus.hide()
+                    self.bonuses.remove(bonus)
 
     def resetLevel(self):
         for ball in self.balls:
             ball.ball.hide()
 
         self.balls.clear()
+
+        for bonus in self.bonuses:
+            bonus.bonus.hide()
+
+        self.bonuses.clear()
 
         self.balls.append(Ball(self, self.startingBallSize))
         self.balls[0].ball.setPixmap(self.balls[0].pixMapScaled)
@@ -288,7 +314,8 @@ class SimMoveDemo(QWidget):
         for player in self.players:
             player.PositionX = player.initialPositionX
             player.update(Qt.Key_Minus)
-            if player.weapon.isActive == True:
+            player.bonusNoWeapon = False
+            if player.weapon.isActive:
                 player.weapon.isActive = False
                 player.weapon.update()
         self.currentAmp = AMPLITUDE
@@ -317,11 +344,11 @@ class SimMoveDemo(QWidget):
         sender = self.sender()
         if sender.playerId == 'player1':
             previous = self.player1PointsTag.text()
-            updatedPoints = int(previous) + 50
+            updatedPoints = int(previous) + num
             self.player1PointsTag.setText(str(updatedPoints))
         elif sender.playerId == 'player2':
             previous = self.player2PointsTag.text()
-            updatedPoints = int(previous) + 50
+            updatedPoints = int(previous) + num
             self.player2PointsTag.setText(str(updatedPoints))
 
     def gameOver(self):
@@ -329,6 +356,7 @@ class SimMoveDemo(QWidget):
         self.getReadyLabel.show()
         self.getReadyLabel.raise_()
         self.timer.stop()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

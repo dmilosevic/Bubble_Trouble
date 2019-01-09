@@ -1,6 +1,6 @@
-from PyQt5.QtCore import *  # Qt, QSize
+from PyQt5.QtCore import *
 from PyQt5.QtGui import QPalette, QBrush, QImage, QFont
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QStackedWidget
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
 from settings import *
 
 
@@ -70,7 +70,6 @@ class Menu(QWidget):
             "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
         self.isActive = False
         self.showForm2Signal.emit()
-        # self.connect(self.startGame)
 
     def mouseOverLabel1P(self, event):
         self.labelOnePlayer.setStyleSheet(

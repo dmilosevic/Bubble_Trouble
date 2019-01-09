@@ -35,6 +35,9 @@ class Player(QWidget): #player1 or player2
         self.Heigth = 50
         self.Width = 50
 
+        self.bonusNoWeapon = False
+        self.counterBonus = 0
+
         self.lifes = 3
         self.score = 0
 
@@ -53,12 +56,20 @@ class Player(QWidget): #player1 or player2
             self.PositionY = PLAYER_HEIGTH
             #self.player.setGeometry(700, 400, 50, 50)
         self.weapon = Weapon(self)
+
     def timerEvent(self, event):
+        if self.bonusNoWeapon:
+            self.counterBonus += 1
+            if self.counterBonus == 80:
+                self.weapon.isActive = True
+                self.counterBonus = 0
+                self.bonusNoWeapon = False
         self.weapon.update()
         self.displayWeapon = self.weapon.weapon
     def shoot(self):
         #self.weapon = Weapon(self)
-        self.weapon.isActive = True
+        if not self.bonusNoWeapon:
+            self.weapon.isActive = True
         #self.weapon.update()
 
     def drawPlayer(self, orientation):
