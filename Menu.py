@@ -1,18 +1,15 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QPalette, QBrush, QImage, QFont
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QMainWindow, QApplication
 from settings import *
+from Game import SimMoveDemo
+import sys
 
 
-class Menu(QWidget):
-    showForm2Signal = pyqtSignal()
-
+class Menu(QMainWindow):
     def __init__(self):
         super().__init__()
-
         self.setGeometry(600, 200, WINDOWWIDTH, WINDOWHEIGHT)
-
-        self.isActive = True
         self.background = IMAGES_DIR + 'MenuBackground.png'
 
         self.__init_ui__()
@@ -69,7 +66,10 @@ class Menu(QWidget):
         self.labelOnePlayer.setStyleSheet(
             "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
         self.isActive = False
-        self.showForm2Signal.emit()
+        self.setCentralWidget(SimMoveDemo(self))
+        self.labelOnePlayer.hide()
+        self.labelTwoPlayers.hide()
+        self.labelQuit.hide()
 
     def mouseOverLabel1P(self, event):
         self.labelOnePlayer.setStyleSheet(
@@ -104,3 +104,9 @@ class Menu(QWidget):
     def mouseLeftLabelQ(self, event):
         self.labelQuit.setStyleSheet(
             "QLabel{ background-color:rgb(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:none;}")
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = Menu()
+    sys.exit(app.exec_())

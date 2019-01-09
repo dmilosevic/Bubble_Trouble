@@ -14,9 +14,10 @@ from settings import *
 
 class SimMoveDemo(QWidget):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent)
 
+        self.parent = parent
         self.currentAmp = AMPLITUDE
         self.startingBallSize = 180
         self.setGeometry(600, 200, WINDOWWIDTH, WINDOWHEIGHT)
@@ -54,7 +55,10 @@ class SimMoveDemo(QWidget):
         sImage = oImage.scaled(QSize(WINDOWWIDTH, WINDOWHEIGHT))
         palette = QPalette()
         palette.setBrush(10, QBrush(sImage))
-        self.setPalette(palette)
+        #self.setPalette(palette)
+        #self.setFocusPolicy(Qt.StrongFocus)
+        self.setFocus()
+        self.parent.setPalette(palette)
         self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint)
 
         # elements
@@ -75,7 +79,7 @@ class SimMoveDemo(QWidget):
         self.initGuiElements(horizontalBox, verticalPlayerInf)
 
         self.setLayout(verticalPlayerInf)
-        self.show()
+        # self.show()
 
     def initPlayerLives(self, pixMap, currentLives):
         labelLives = []
@@ -358,7 +362,7 @@ class SimMoveDemo(QWidget):
         self.timer.stop()
 
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = SimMoveDemo()
-    sys.exit(app.exec_())
+#if __name__ == '__main__':
+ #   app = QApplication(sys.argv)
+  #  ex = SimMoveDemo()
+   # sys.exit(app.exec_())
