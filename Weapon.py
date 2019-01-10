@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QApplication
+from PyQt5.QtWidgets import QWidget, QLabel
 from PyQt5.QtGui import QPixmap
 from settings import *
-import os
+
 
 class Weapon(QWidget):
     def __init__(self, parent):
@@ -16,8 +16,6 @@ class Weapon(QWidget):
         self.posY = self.parent.PositionY
         self.posX = 0
         self.taken = False
-        #print(self.PositionY)
-       # self.label.geometry().y() =
 
     def update(self):
         if self.isActive:
@@ -32,7 +30,6 @@ class Weapon(QWidget):
             else:
                 self.weapon.setGeometry(self.posX, self.posY, 8, WINDOWHEIGHT)
                 self.posY -= WEAPON_SPEED
-                #self.rect = self.rect.move(, -WEAPON_SPEED)a
         else:
             self.weapon.setGeometry(0, 0, 0, 0)
             self.posY = self.parent.PositionY

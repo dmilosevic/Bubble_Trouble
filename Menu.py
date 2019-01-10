@@ -1,6 +1,6 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QPalette, QBrush, QImage, QFont
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QMainWindow, QApplication
+from PyQt5.QtWidgets import QLabel, QVBoxLayout, QMainWindow, QApplication
 from settings import *
 from Game import SimMoveDemo
 import sys
@@ -65,7 +65,6 @@ class Menu(QMainWindow):
     def mouseClicked1P(self, event):
         self.labelOnePlayer.setStyleSheet(
             "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
-        self.isActive = False
         self.setCentralWidget(SimMoveDemo(self))
         self.labelOnePlayer.hide()
         self.labelTwoPlayers.hide()
@@ -82,7 +81,6 @@ class Menu(QMainWindow):
     def mouseClicked2P(self, event):
         self.labelTwoPlayers.setStyleSheet(
             "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
-        self.isActive = False
 
     def mouseOverLabel2P(self, event):
         self.labelTwoPlayers.setStyleSheet(
@@ -95,7 +93,6 @@ class Menu(QMainWindow):
     def mouseClickedQ(self, event):
         self.labelQuit.setStyleSheet(
             "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
-        self.isActive = False
 
     def mouseOverLabelQ(self, event):
         self.labelQuit.setStyleSheet(

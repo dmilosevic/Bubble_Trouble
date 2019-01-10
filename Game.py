@@ -55,8 +55,6 @@ class SimMoveDemo(QWidget):
         sImage = oImage.scaled(QSize(WINDOWWIDTH, WINDOWHEIGHT))
         palette = QPalette()
         palette.setBrush(10, QBrush(sImage))
-        #self.setPalette(palette)
-        #self.setFocusPolicy(Qt.StrongFocus)
         self.setFocus()
         self.parent.setPalette(palette)
         self.setWindowFlags(Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint)
@@ -79,7 +77,6 @@ class SimMoveDemo(QWidget):
         self.initGuiElements(horizontalBox, verticalPlayerInf)
 
         self.setLayout(verticalPlayerInf)
-        # self.show()
 
     def initPlayerLives(self, pixMap, currentLives):
         labelLives = []
@@ -278,7 +275,6 @@ class SimMoveDemo(QWidget):
                      (ball.counter <= player.PositionX + 25 and player.PositionX + 25 <= ball.counter + ball.size) or \
                      (ball.counter <= player.PositionX and ball.counter + ball.size >= player.PositionX + 28) or \
                      (ball.counter >= player.PositionX and ball.counter + ball.size <= player.PositionX + 40):
-                        # print('udario')
                         self.timer.stop()
                         ball.ball.hide()
                         self.balls.remove(ball)
@@ -360,9 +356,3 @@ class SimMoveDemo(QWidget):
         self.getReadyLabel.show()
         self.getReadyLabel.raise_()
         self.timer.stop()
-
-
-#if __name__ == '__main__':
- #   app = QApplication(sys.argv)
-  #  ex = SimMoveDemo()
-   # sys.exit(app.exec_())

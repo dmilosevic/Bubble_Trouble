@@ -69,7 +69,5 @@ class Ball(QWidget):
             self.dy = -abs(self.currentAmplitude * sin(3 * self.splitedCounter / 1.6 / 100)) + 400 - self.size
         if self.sinus and self.splitedRight:
             self.dy = -abs(self.currentAmplitude * sin(3*self.splitedCounter/1.6/100)) + 400 - self.size
-            #self.currentAmplitude -= 50
         elif not self.sinus and self.splitedRight:
             self.dy = -abs(self.currentAmplitude * cos(3 * self.splitedCounter / 1.6 / 100)) + 400 - self.size
-            #self.currentAmplitude -= 50
