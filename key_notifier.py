@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QThread, QObject, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import Qt, QThread, QObject, pyqtSignal, pyqtSlot
 from settings import *
 
 import time
@@ -28,10 +28,12 @@ class KeyNotifier(QObject):
         self.thread.start()
 
     def add_key(self, key):
-        self.keys.append(key)
+        if key == Qt.Key_Space or key == Qt.Key_Right or key == Qt.Key_Left or key == Qt.Key_Shift or key == Qt.Key_A or key == Qt.Key_D:
+            self.keys.append(key)
 
     def rem_key(self, key):
-        self.keys.remove(key)
+        if self.keys.__contains__(key):
+            self.keys.remove(key)
 
     def die(self):
         """

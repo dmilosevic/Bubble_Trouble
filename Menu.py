@@ -7,6 +7,7 @@ import sys
 
 
 class Menu(QMainWindow):
+
     def __init__(self):
         super().__init__()
         self.setGeometry(600, 200, WINDOWWIDTH, WINDOWHEIGHT)
@@ -65,7 +66,9 @@ class Menu(QMainWindow):
     def mouseClicked1P(self, event):
         self.labelOnePlayer.setStyleSheet(
             "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
-        self.setCentralWidget(SimMoveDemo(self))
+        game = SimMoveDemo(self)
+        game.menuSignal.emit(1)
+        self.setCentralWidget(game)
         self.labelOnePlayer.hide()
         self.labelTwoPlayers.hide()
         self.labelQuit.hide()
@@ -81,6 +84,12 @@ class Menu(QMainWindow):
     def mouseClicked2P(self, event):
         self.labelTwoPlayers.setStyleSheet(
             "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
+        game = SimMoveDemo(self)
+        game.menuSignal.emit(2)
+        self.setCentralWidget(game)
+        self.labelOnePlayer.hide()
+        self.labelTwoPlayers.hide()
+        self.labelQuit.hide()
 
     def mouseOverLabel2P(self, event):
         self.labelTwoPlayers.setStyleSheet(
@@ -93,6 +102,7 @@ class Menu(QMainWindow):
     def mouseClickedQ(self, event):
         self.labelQuit.setStyleSheet(
             "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
+        sys.exit()
 
     def mouseOverLabelQ(self, event):
         self.labelQuit.setStyleSheet(

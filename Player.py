@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QApplication
 from PyQt5.QtCore import Qt, QBasicTimer, QRect, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QPixmap
+from socket_send import *
+from SenderThread import *
 
 from Weapon import Weapon
 from settings import *
@@ -15,11 +17,13 @@ class Player(QWidget):  # player1 or player2
 
         super().__init__(parent)
 
+        self.sendSocket = SenderThread()
+        self.sendSocket.start()
         self.isDead = False
         self.playerId = playerId
         self.playerImg_normal = IMAGES_DIR + playerId + '.png'
         self.playerImg_left = IMAGES_DIR + playerId + '_left.png'
-        self.playerImg_right = IMAGES_DIR + playerId +  '_right.png'
+        self.playerImg_right = IMAGES_DIR + playerId + '_right.png'
         self.player = QLabel(parent)
         self.initialPositionX = None
         self.initialPositionY = None
@@ -44,7 +48,7 @@ class Player(QWidget):  # player1 or player2
             self.PositionX = 50
             self.initialPositionX = 50
             self.PositionY = PLAYER_HEIGTH
-        elif self.playerId =='player2':
+        elif self.playerId == 'player2':
             self.PositionX = 700
             self.initialPositionX = 700
             self.PositionY = PLAYER_HEIGTH
@@ -57,7 +61,7 @@ class Player(QWidget):  # player1 or player2
                 self.counterBonus = 0
                 self.bonusNoWeapon = False
         self.weapon.update()
-        self.displayWeapon = self.weapon.weapon
+        #self.displayWeapon = self.weapon.weapon
 
     def shoot(self):
         if not self.bonusNoWeapon:
@@ -84,6 +88,8 @@ class Player(QWidget):  # player1 or player2
         self.player.setPixmap(self.PixMap)
 
     def update(self, key):
+
+        self.sendSocket.senderSignal.emit(key)
 
         if self.playerId == 'player1':
             if key == Qt.Key_Space:  # and not self.weapon.isActive:
@@ -124,3 +130,8 @@ class Player(QWidget):  # player1 or player2
         self.lifes -= num
         if self.lifes == 0:
             self.isDead = True
+
+    def sendPosition(self, message):
+        worker = QThread()
+        self.moveToThread(worker)
+        worker.started.connect(self.sendPosition)

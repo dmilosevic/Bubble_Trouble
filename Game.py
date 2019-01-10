@@ -1,8 +1,6 @@
-import sys
-
-from PyQt5.QtCore import Qt, QSize, QBasicTimer
-from PyQt5.QtGui import QPixmap, QPalette, QBrush, QImage, QFont
-from PyQt5.QtWidgets import QWidget, QLabel, QApplication, QVBoxLayout, QHBoxLayout
+from PyQt5.QtCore import Qt, QSize, QBasicTimer, pyqtSignal
+from PyQt5.QtGui import QPalette, QBrush, QImage, QFont
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from key_notifier import KeyNotifier
 from Player import Player
 from Ball import Ball
@@ -13,24 +11,32 @@ from settings import *
 
 
 class SimMoveDemo(QWidget):
+    menuSignal = pyqtSignal(int)
 
     def __init__(self, parent):
         super().__init__(parent)
 
         self.parent = parent
+        self.menuSignal.connect(self.addPlayers)
         self.currentAmp = AMPLITUDE
         self.startingBallSize = 180
         self.setGeometry(600, 200, WINDOWWIDTH, WINDOWHEIGHT)
-        self.players = [Player(self, 'player2'), Player(self, 'player1')]
+        self.players = []
         self.bonuses = []
         self.balls = [Ball(self, self.startingBallSize)]
-        self.__init_ui__()
         self.key_notifier = KeyNotifier()
         self.key_notifier.key_signal.connect(self.__update_position__)
         self.key_notifier.start()
         self.timer = QBasicTimer()
         self.timer.start(20, self)
         self.stopOnStart = True
+
+    def addPlayers(self, option):
+        if option == 1:
+            self.players = [Player(self, 'player1')]
+        elif option == 2:
+            self.players = [Player(self, 'player1'), Player(self, 'player2')]
+        self.__init_ui__()
 
     def initPlayersAndBalls(self):
         for player in self.players:
@@ -43,8 +49,8 @@ class SimMoveDemo(QWidget):
         for ball in self.balls:
             ball.ball.setPixmap(ball.pixMapScaled)
             ball.ball.setGeometry(ball.x, ball.y, ball.size, ball.size)
-        self.players[0].show()
-        self.players[1].show()
+        for p in self.players:
+            p.show()
 
     def __init_ui__(self):
         self.initPlayersAndBalls()
@@ -63,16 +69,24 @@ class SimMoveDemo(QWidget):
         self.livesPic1 = QPixmap(IMAGES_DIR + 'player1.png').scaled(20, 30)
         self.livesPic2 = QPixmap(IMAGES_DIR + 'player2.png').scaled(20, 30)
 
-        self.labelLivesP1 = self.initPlayerLives(self.livesPic1, self.players[0].lifes)
-        self.labelLivesP2 = self.initPlayerLives(self.livesPic2, self.players[1].lifes)
         verticalPlayerInf = QVBoxLayout()
         horizontalBox = QHBoxLayout()
 
-        for label in self.labelLivesP1:
+        self.labelLives = []
+        for player in self.players:
+            self.labelLives.append(self.initPlayerLives(QPixmap(IMAGES_DIR + player.playerId + '.png').scaled(20, 30), player.lifes))
+        # self.labelLivesP1 = self.initPlayerLives(self.livesPic1, self.players[0].lifes)
+        # self.labelLivesP2 = self.initPlayerLives(self.livesPic2, self.players[1].lifes)
+
+        for label in self.labelLives[0]:
             horizontalBox.addWidget(label, 1, Qt.AlignLeft | Qt.AlignTop)
-        horizontalBox.addSpacing(WINDOWWIDTH-2*80-75)
-        for label in self.labelLivesP2:
-            horizontalBox.addWidget(label, 1, Qt.AlignRight | Qt.AlignTop)
+
+        if len(self.players) > 1:
+            horizontalBox.addSpacing(WINDOWWIDTH-2*80-75)
+            for label in self.labelLives[1]:
+                horizontalBox.addWidget(label, 1, Qt.AlignRight | Qt.AlignTop)
+        else:
+            horizontalBox.addSpacing(WINDOWWIDTH - 2 * 80 - 15)
 
         self.initGuiElements(horizontalBox, verticalPlayerInf)
 
@@ -87,9 +101,9 @@ class SimMoveDemo(QWidget):
 
     def updatePlayerPixMapLives(self, pixMap, currentLives, playerUpdated):
         if playerUpdated.playerId == 'player1':
-            self.labelLivesP1[currentLives].clear()
+            self.labelLives[0][currentLives].clear()
         elif playerUpdated.playerId == 'player2':
-            self.labelLivesP2[-currentLives-1].clear()
+            self.labelLives[1][-currentLives-1].clear()
 
     def initGuiElements(self, horizontalBox, verticalPlayerInf):
         self.getReadyLabel = QLabel()

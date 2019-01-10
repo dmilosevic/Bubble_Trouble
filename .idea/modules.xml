@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Bubble_Trouble.iml" filepath="$PROJECT_DIR$/.idea/Bubble_Trouble.iml" />
+      <module fileurl="file://$USER_HOME$/Downloads/Bubble_Trouble/.idea/Bubble_Trouble.iml" filepath="$USER_HOME$/Downloads/Bubble_Trouble/.idea/Bubble_Trouble.iml" />
       <module fileurl="file://$USER_HOME$/Desktop/bubble-trouble-master/.idea/bubble-trouble-master.iml" filepath="$USER_HOME$/Desktop/bubble-trouble-master/.idea/bubble-trouble-master.iml" />
     </modules>
   </component>
