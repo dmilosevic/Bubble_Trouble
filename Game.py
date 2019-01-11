@@ -30,12 +30,13 @@ class SimMoveDemo(QWidget):
         self.timer = QBasicTimer()
         self.timer.start(20, self)
         self.stopOnStart = True
+        self.playerLen = None
 
     def addPlayers(self, option):
         if option == 1:
-            self.players = [Player(self, 'player1')]
+            self.players = [Player(self, 'player1',1)]
         elif option == 2:
-            self.players = [Player(self, 'player1'), Player(self, 'player2')]
+            self.players = [Player(self, 'player1',2), Player(self, 'player2',2)]
         self.__init_ui__()
 
     def initPlayersAndBalls(self):
@@ -86,7 +87,7 @@ class SimMoveDemo(QWidget):
             for label in self.labelLives[1]:
                 horizontalBox.addWidget(label, 1, Qt.AlignRight | Qt.AlignTop)
         else:
-            horizontalBox.addSpacing(WINDOWWIDTH - 2 * 80 - 15)
+            horizontalBox.addSpacing(WINDOWWIDTH-150)
 
         self.initGuiElements(horizontalBox, verticalPlayerInf)
 

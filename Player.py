@@ -13,10 +13,11 @@ class Player(QWidget):  # player1 or player2
     livesSignal = pyqtSignal(int)
     pointsSignal = pyqtSignal(int)
 
-    def __init__(self, parent, playerId):
+    def __init__(self, parent, playerId, noOfPlayers):
 
         super().__init__(parent)
 
+        self.parent = parent
         self.sendSocket = SenderThread()
         self.sendSocket.start()
         self.isDead = False
@@ -44,14 +45,21 @@ class Player(QWidget):  # player1 or player2
         self.timer = QBasicTimer()
         self.timer.start(32, self)
 
-        if self.playerId == 'player1':
-            self.PositionX = 50
-            self.initialPositionX = 50
-            self.PositionY = PLAYER_HEIGTH
-        elif self.playerId == 'player2':
-            self.PositionX = 700
-            self.initialPositionX = 700
-            self.PositionY = PLAYER_HEIGTH
+
+        if noOfPlayers == 1:
+            if self.playerId == 'player1':
+                self.PositionX = WINDOWWIDTH/2
+                self.initialPositionX = WINDOWWIDTH/2
+                self.PositionY = PLAYER_HEIGTH
+        elif noOfPlayers == 2:
+            if self.playerId == 'player1':
+                self.PositionX = 50
+                self.initialPositionX =  50
+                self.PositionY = PLAYER_HEIGTH
+            elif self.playerId == 'player2':
+                self.PositionX = 700
+                self.initialPositionX = 700
+                self.PositionY = PLAYER_HEIGTH
         self.weapon = Weapon(self)
 
     def timerEvent(self, event):
