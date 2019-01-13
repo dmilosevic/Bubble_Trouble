@@ -52,7 +52,7 @@ class Menu(QMainWindow):
 
         self.labelTwoPlayers = self.initLabel("2 PLAYERS")
 
-        self.labelQuit = self.initLabel("QUIT")
+        self.labelQuit = self.initLabel("CUP")
 
         self.labelOnePlayer.setGeometry(175, 235, 185, 35)
         self.labelTwoPlayers.setGeometry(165, 295, 185, 35)
@@ -123,7 +123,14 @@ class Menu(QMainWindow):
     def mouseClickedQ(self, event):
         self.labelQuit.setStyleSheet(
             "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
-        sys.exit()
+        #self.close()
+        game = SimMoveDemo(self)
+        game.menuSignal.emit(4)
+        self.setCentralWidget(game)
+        self.labelOnePlayer.hide()
+        self.labelTwoPlayers.hide()
+        self.labelQuit.hide()
+
 
     def mouseOverLabelQ(self, event):
         self.labelQuit.setStyleSheet(

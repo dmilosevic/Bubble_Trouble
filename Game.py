@@ -30,11 +30,15 @@ class SimMoveDemo(QWidget):
         self.setGeometry(600, 200, WINDOWWIDTH, WINDOWHEIGHT)
         self.players = []
         self.bonuses = []
+        self.cupPlayers = []
+        self.cupMode = False
+        self.endOfCup = False
         self.balls = [Ball(self, self.startingBallSize)]
         self.key_notifier = KeyNotifier()
         self.key_notifier.key_signal.connect(self.__update_position__)
         self.key_notifier.start()
         self.stopOnStart = True
+        self.finishCup = False
         self.playerLen = None
         self.previousBalls = len(self.balls)
         self.currentLevel = 1
@@ -42,9 +46,14 @@ class SimMoveDemo(QWidget):
 
     def addPlayers(self, option):
         if option == 1:
-            self.players = [Player(self, 'player1',1)]
+            self.players = [Player(self, 'player1', 1)]
         elif option == 2:
-            self.players = [Player(self, 'player1',2), Player(self, 'player2',2)]
+            self.players = [Player(self, 'player1', 2), Player(self, 'player2', 2)]
+        elif option == 4:
+            self.players = [Player(self, 'player1', 2), Player(self, 'player2', 2)]
+
+            self.cupMode = True
+
         self.__init_ui__()
         self.timer = QBasicTimer()
         self.timer.start(20, self)
@@ -57,6 +66,9 @@ class SimMoveDemo(QWidget):
             player.weapon.weapon.setGeometry(0, WINDOWHEIGHT-87, WINDOWWIDTH, 0)
             player.livesSignal.connect(self.updateLives)
             player.pointsSignal.connect(self.updatePoints)
+        if self.cupMode:
+            self.weaponObj = self.players[0].weapon
+            self.weaponObj2 = self.players[1].weapon
         for ball in self.balls:
             ball.ball.setPixmap(ball.pixMapScaled)
             ball.ball.setGeometry(ball.x, ball.y, ball.size, ball.size)
@@ -81,7 +93,7 @@ class SimMoveDemo(QWidget):
         self.livesPic2 = QPixmap(IMAGES_DIR + 'player2.png').scaled(20, 30)
 
         verticalPlayerInf = QVBoxLayout()
-        horizontalBox = QHBoxLayout()
+        self.horizontalBox = QHBoxLayout()
 
         self.labelLives = []
         for player in self.players:
@@ -90,16 +102,16 @@ class SimMoveDemo(QWidget):
         # self.labelLivesP2 = self.initPlayerLives(self.livesPic2, self.players[1].lifes)
 
         for label in self.labelLives[0]:
-            horizontalBox.addWidget(label, 1, Qt.AlignLeft | Qt.AlignTop)
+            self.horizontalBox.addWidget(label, 1, Qt.AlignLeft | Qt.AlignTop)
 
         if len(self.players) > 1:
-            horizontalBox.addSpacing(WINDOWWIDTH-2*80-75)
+            self.horizontalBox.addSpacing(WINDOWWIDTH-2*80-75)
             for label in self.labelLives[1]:
-                horizontalBox.addWidget(label, 1, Qt.AlignRight | Qt.AlignTop)
+                self.horizontalBox.addWidget(label, 1, Qt.AlignRight | Qt.AlignTop)
         else:
-            horizontalBox.addSpacing(WINDOWWIDTH-150)
+            self.horizontalBox.addSpacing(WINDOWWIDTH-150)
 
-        self.initGuiElements(horizontalBox, verticalPlayerInf)
+        self.initGuiElements(self.horizontalBox, verticalPlayerInf)
 
         self.setLayout(verticalPlayerInf)
 
@@ -125,25 +137,25 @@ class SimMoveDemo(QWidget):
         self.getReadyLabel.setStyleSheet(
             "QLabel{ background-color:rgba(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:solid;}")
 
-        player11LabelTxt = '1 PLAYER'
-        player1Tag = QLabel()
-        player1Tag.setText(player11LabelTxt)
-        player1Tag.setFont(QFont('Denne Kitten Heels', 18, QFont.ExtraBold))
-        player1Tag.setAlignment(Qt.AlignLeft)
-        player1Tag.setFrameStyle(33)
-        player1Tag.setMidLineWidth(1)
-        player1Tag.setStyleSheet("QLabel{background-color: #CECECE; color:#E20000;}")
-        player1Tag.setFixedSize(QSize(130, 31))
+        self.player11LabelTxt = '1 PLAYER'
+        self.player1Tag = QLabel()
+        self.player1Tag.setText(self.player11LabelTxt)
+        self.player1Tag.setFont(QFont('Denne Kitten Heels', 18, QFont.ExtraBold))
+        self.player1Tag.setAlignment(Qt.AlignLeft)
+        self.player1Tag.setFrameStyle(33)
+        self.player1Tag.setMidLineWidth(1)
+        self.player1Tag.setStyleSheet("QLabel{background-color: #CECECE; color:#E20000;}")
+        self.player1Tag.setFixedSize(QSize(130, 31))
 
-        player2LabelTxt = '2 PLAYER'
-        player2Tag = QLabel()
-        player2Tag.setText(player2LabelTxt)
-        player2Tag.setFont(QFont('Denne Kitten Heels', 18, QFont.ExtraBold))
-        player2Tag.setAlignment(Qt.AlignLeft)
-        player2Tag.setFrameStyle(33)
-        player2Tag.setMidLineWidth(1)
-        player2Tag.setStyleSheet("QLabel{background-color: #CECECE; color:#265EBB;}")
-        player2Tag.setFixedSize(QSize(130, 31))
+        self.player2LabelTxt = '2 PLAYER'
+        self.player2Tag = QLabel()
+        self.player2Tag.setText(self.player2LabelTxt)
+        self.player2Tag.setFont(QFont('Denne Kitten Heels', 18, QFont.ExtraBold))
+        self.player2Tag.setAlignment(Qt.AlignLeft)
+        self.player2Tag.setFrameStyle(33)
+        self.player2Tag.setMidLineWidth(1)
+        self.player2Tag.setStyleSheet("QLabel{background-color: #CECECE; color:#265EBB;}")
+        self.player2Tag.setFixedSize(QSize(130, 31))
 
         player1Points = '0'
         self.player1PointsTag = QLabel()
@@ -191,13 +203,13 @@ class SimMoveDemo(QWidget):
         verticalLevel.addWidget(self.levelNumTag, 0, Qt.AlignCenter)
 
         horizontalPlayerInf = QHBoxLayout()
-        horizontalPlayerInf.addWidget(player1Tag)
+        horizontalPlayerInf.addWidget(self.player1Tag)
         horizontalPlayerInf.addWidget(self.player1PointsTag)
         horizontalPlayerInf.addSpacing(90)
         horizontalPlayerInf.addLayout(verticalLevel)
         horizontalPlayerInf.addSpacing(82)
         horizontalPlayerInf.addWidget(self.player2PointsTag)
-        horizontalPlayerInf.addWidget(player2Tag)
+        horizontalPlayerInf.addWidget(self.player2Tag)
 
         horizontalPlayerInf.setAlignment(Qt.AlignBottom)
         horizontalPlayerInf.setContentsMargins(10, 0, 10, 0)
@@ -382,9 +394,6 @@ class SimMoveDemo(QWidget):
         self.levelNumTag.setText(str(self.currentLevel))
         self.timer.start(20, self)
 
-    def addNewBalls(self):
-        self.balls.append(Ball(self, ))
-
     def resetLevel(self):
         for ball in self.balls:
             ball.ball.hide()
@@ -423,9 +432,14 @@ class SimMoveDemo(QWidget):
         time.sleep(1)
         self.currentAmp = AMPLITUDE
         self.stopOnStart = True
+        # if len(self.players) != 0:
+            # self.getReadyLabel.setText('Get ready!')
         self.getReadyLabel.show()
         self.getReadyLabel.raise_()
-        self.timer.start(20, self)
+        if not self.finishCup:
+            self.timer.start(20, self)
+        else:
+            self.getReadyLabel.setText('Cup Finished!')
 
     def updateLives(self):
         sender = self.sender()
@@ -448,11 +462,27 @@ class SimMoveDemo(QWidget):
         if sender.lifes == 0:
             sender.isDead = True
 
+
+
         if sender.isDead:
             sender.player.hide()
             self.players.remove(sender)
 
         if len(self.players) == 0:
+            if self.endOfCup:
+                self.finishCup = True
+            p1points = int(self.player1PointsTag.text())
+            p2points = int(self.player2PointsTag.text())
+            if len(self.cupPlayers) == 0:
+                if p1points >= p2points:
+                    self.cupPlayers.append('1 player,' + str(p1points))
+                else:
+                    self.cupPlayers.append('2 player,' + str(p2points))
+            else:
+                if p1points >= p2points:
+                    self.cupPlayers.append('3 player,' + str(p1points))
+                else:
+                    self.cupPlayers.append('4 player,' + str(p2points))
             self.gameOver()
 
     def updatePoints(self, num):
@@ -474,7 +504,66 @@ class SimMoveDemo(QWidget):
         playerLabel.setText(points)
 
     def gameOver(self):
-        self.getReadyLabel.setText("Game over")
+        if not self.cupMode:
+            self.getReadyLabel.setText("Game over")
+        else:
+            playerWon = self.cupPlayers[len(self.cupPlayers)-1]
+            self.getReadyLabel.setText(playerWon.split(',')[0].upper()+" WON!")
+
         self.getReadyLabel.show()
         self.getReadyLabel.raise_()
         self.timer.stop()
+
+        if self.cupMode:
+            self.players = [Player(self, 'player1', 2), Player(self, 'player2', 2)]
+
+            label = self.player1Tag
+            self.player1PointsTag.setText('0')
+            self.player2PointsTag.setText('0')
+            x = 0
+            if len(self.cupPlayers) == 1:
+                for p in self.players:
+                    if p.playerId == 'player1':
+                        label.setText('3 PLAYER')
+                    elif p.playerId == 'player2':
+                        label.setText('4 PLAYER')
+
+                    p.player.setPixmap(p.PixMap)
+                    if x == 0:
+                        p.weapon.weapon = self.weaponObj.weapon
+                    else:
+                        p.weapon.weapon = self.weaponObj2.weapon
+                    x += 1
+                    p.weapon.weapon.show()
+                    p.livesSignal.connect(self.updateLives)
+                    p.pointsSignal.connect(self.updatePoints)
+
+                    #p.show()
+                    p.player.show()
+
+                    label = self.player2Tag
+
+            else: #finale
+                finalist1 = self.cupPlayers[0].split(',')[0]
+                finalist1points = self.cupPlayers[0].split(',')[1]
+                finalist2 = self.cupPlayers[1].split(',')[0]
+                finalist2points = self.cupPlayers[1].split(',')[1]
+
+                self.player1Tag.setText(finalist1.upper())
+                self.player2Tag.setText(finalist2.upper())
+                x = 0
+                for p in self.players:
+                    p.player.setPixmap(p.PixMap)
+                    if x == 0:
+                        p.weapon.weapon = self.weaponObj.weapon
+                    else:
+                        p.weapon.weapon = self.weaponObj2.weapon
+                    x += 1
+                    p.weapon.weapon.show()
+                    p.livesSignal.connect(self.updateLives)
+                    p.pointsSignal.connect(self.updatePoints)
+
+                    # p.show()
+                    p.player.show()
+                self.endOfCup = True
+            self.resetLevel()

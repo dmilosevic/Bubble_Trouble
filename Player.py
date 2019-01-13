@@ -36,7 +36,7 @@ class Player(QWidget):  # player1 or player2
         self.bonusNoWeapon = False
         self.counterBonus = 0
 
-        self.lifes = 3
+        self.lifes = 1
         self.score = 0
 
         self.timer = QBasicTimer()

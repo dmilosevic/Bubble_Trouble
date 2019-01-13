@@ -13,11 +13,13 @@ class Weapon(QWidget):
         self.isActive = False
         self.weapon = QLabel(parent)
         self.PixMap = QPixmap(self.image)
+        self.weapon.setPixmap(self.PixMap)
         self.posY = self.parent.PositionY
         self.posX = 0
         self.taken = False
 
     def update(self):
+
         if self.isActive:
             if not self.taken:
                 self.posX = self.parent.PositionX + 14
