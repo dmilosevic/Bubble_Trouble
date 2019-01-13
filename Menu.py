@@ -2,9 +2,30 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import QPalette, QBrush, QImage, QFont
 from PyQt5.QtWidgets import QLabel, QVBoxLayout, QMainWindow, QApplication
 from settings import *
-from Game import SimMoveDemo
+from Game import SimMoveDemo, queueForCalcs, queueForResults, queueCalcLives, queueResLives
 import sys
+from multiprocessing import Process, Queue
 
+
+def pointsProcess(qCalcs: Queue, qRes: Queue):
+    while True:
+        if not qCalcs.empty():
+            calc = str(qCalcs.get())
+            id = calc.split(',')[0]
+            previous = calc.split(',')[1]
+            points = calc.split(',')[2]
+
+            newPoints = int(previous)+int(points)
+            qRes.put(str(newPoints))
+
+
+def livesProcess(qCalcs: Queue, qRes: Queue):
+    while True:
+        if not qCalcs.empty():
+            calc = str(qCalcs.get())
+            ret = int(calc) - 1
+
+            qRes.put(str(ret))
 
 class Menu(QMainWindow):
 
@@ -115,5 +136,9 @@ class Menu(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    process = Process(target=pointsProcess, args=[queueForCalcs, queueForResults])
+    processLives = Process(target=livesProcess, args=[queueCalcLives, queueResLives])
+    process.start()
+    processLives.start()
     ex = Menu()
     sys.exit(app.exec_())

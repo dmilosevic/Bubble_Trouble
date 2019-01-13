@@ -24,7 +24,7 @@ class Ball(QWidget):
         self.y = WINDOWHEIGHT - 450
         self.x = WINDOWWIDTH / 2 - size / 2
         self.dy = 0
-        self.currentAmplitude = AMPLITUDE - (AMPLITUDE-size*4)
+        self.currentAmplitude = AMPLITUDE-(AMPLITUDE - size*2.5)
 
     def start(self):
         if self.forward:
@@ -59,9 +59,9 @@ class Ball(QWidget):
         if self.hit:
             self.sinus = not self.sinus
       
-        if self.sinus and not self.splited:
+        if self.forward and not self.splited:
             self.dy = -abs(AMPLITUDE * sin(3*self.counter/1.6/100)) + 400 - self.size
-        elif not self.sinus and not self.splited:
+        elif not self.forward and not self.splited:
             self.dy = -abs(AMPLITUDE * cos(3*self.counter/1.6/100)) + 400 - self.size
         if self.sinus and self.splitedLeft:
             self.dy = -abs(self.currentAmplitude * cos(3*self.splitedCounter/1.6/100)) + 400 - self.size

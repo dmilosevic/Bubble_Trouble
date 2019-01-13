@@ -1,8 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QLabel, QApplication
 from PyQt5.QtCore import Qt, QBasicTimer, QRect, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QPixmap
-from socket_send import *
-from SenderThread import *
 
 from Weapon import Weapon
 from settings import *
@@ -10,16 +8,15 @@ from settings import *
 
 class Player(QWidget):  # player1 or player2
 
-    livesSignal = pyqtSignal(int)
+    livesSignal = pyqtSignal()
     pointsSignal = pyqtSignal(int)
 
     def __init__(self, parent, playerId, noOfPlayers):
 
         super().__init__(parent)
 
+        self.noOfPlayers = noOfPlayers
         self.parent = parent
-        self.sendSocket = SenderThread()
-        self.sendSocket.start()
         self.isDead = False
         self.playerId = playerId
         self.playerImg_normal = IMAGES_DIR + playerId + '.png'
@@ -46,15 +43,15 @@ class Player(QWidget):  # player1 or player2
         self.timer.start(32, self)
 
 
-        if noOfPlayers == 1:
+        if self.noOfPlayers == 1:
             if self.playerId == 'player1':
                 self.PositionX = WINDOWWIDTH/2
                 self.initialPositionX = WINDOWWIDTH/2
                 self.PositionY = PLAYER_HEIGTH
-        elif noOfPlayers == 2:
+        elif self.noOfPlayers == 2:
             if self.playerId == 'player1':
-                self.PositionX = 50
-                self.initialPositionX =  50
+                self.PositionX = 55
+                self.initialPositionX =  55
                 self.PositionY = PLAYER_HEIGTH
             elif self.playerId == 'player2':
                 self.PositionX = 700
@@ -97,8 +94,6 @@ class Player(QWidget):  # player1 or player2
 
     def update(self, key):
 
-        self.sendSocket.senderSignal.emit(key)
-
         if self.playerId == 'player1':
             if key == Qt.Key_Space:  # and not self.weapon.isActive:
                     self.shoot()
@@ -115,6 +110,7 @@ class Player(QWidget):  # player1 or player2
                     self.player.setGeometry(self.PositionX, self.PositionY, self.Width, self.Heigth)
             elif key == Qt.Key_Minus:
                 self.drawPlayer('normal')
+                self.PositionX = self.initialPositionX
                 self.player.setGeometry(self.PositionX, self.PositionY, self.Width, self.Heigth)
 
         elif self.playerId == 'player2':
@@ -132,14 +128,10 @@ class Player(QWidget):  # player1 or player2
                     self.player.setGeometry(self.PositionX, self.PositionY, self.Width, self.Heigth)
             elif key == Qt.Key_Minus:
                 self.drawPlayer('normal')
-                self.player.setGeometry(self.PositionX, self.PositionY, self.Width, self.Heigth)
+                self.player.setGeometry(self.initialPositionX, self.PositionY, self.Width, self.Heigth)
 
-    def updateLives(self, num):
-        self.lifes -= num
-        if self.lifes == 0:
-            self.isDead = True
+    # def updateLives(self, num):
+    #     self.lifes -= num
+    #     if self.lifes == 0:
+    #         self.isDead = True
 
-    def sendPosition(self, message):
-        worker = QThread()
-        self.moveToThread(worker)
-        worker.started.connect(self.sendPosition)
