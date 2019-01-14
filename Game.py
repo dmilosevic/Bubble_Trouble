@@ -8,7 +8,7 @@ from Bonus import *
 import time
 import random
 from settings import *
-from multiprocessing import Process, Queue
+from multiprocessing import Queue
 
 
 queueForCalcs = Queue()
@@ -32,7 +32,7 @@ class SimMoveDemo(QWidget):
         self.bonuses = []
         self.cupPlayers = []
         self.cupMode = False
-        self.endOfCup = False
+        self.finalGame = False
         self.balls = [Ball(self, self.startingBallSize)]
         self.key_notifier = KeyNotifier()
         self.key_notifier.key_signal.connect(self.__update_position__)
@@ -43,6 +43,12 @@ class SimMoveDemo(QWidget):
         self.previousBalls = len(self.balls)
         self.currentLevel = 1
         self.currentBall = 0
+        self.semiFinalEnd = False
+        self.weaponObj = None
+        self.weaponObj2 = None
+        self.deadPoints = []
+        self.finalist1points = 0
+        self.finalist2points = 0
 
     def addPlayers(self, option):
         if option == 1:
@@ -51,7 +57,6 @@ class SimMoveDemo(QWidget):
             self.players = [Player(self, 'player1', 2), Player(self, 'player2', 2)]
         elif option == 4:
             self.players = [Player(self, 'player1', 2), Player(self, 'player2', 2)]
-
             self.cupMode = True
 
         self.__init_ui__()
@@ -98,8 +103,6 @@ class SimMoveDemo(QWidget):
         self.labelLives = []
         for player in self.players:
             self.labelLives.append(self.initPlayerLives(QPixmap(IMAGES_DIR + player.playerId + '.png').scaled(20, 30), player.lifes))
-        # self.labelLivesP1 = self.initPlayerLives(self.livesPic1, self.players[0].lifes)
-        # self.labelLivesP2 = self.initPlayerLives(self.livesPic2, self.players[1].lifes)
 
         for label in self.labelLives[0]:
             self.horizontalBox.addWidget(label, 1, Qt.AlignLeft | Qt.AlignTop)
@@ -127,6 +130,15 @@ class SimMoveDemo(QWidget):
             self.labelLives[0][currentLives].clear()
         elif playerUpdated.playerId == 'player2':
             self.labelLives[1][-currentLives-1].clear()
+
+    def resetPlayerPixMapLives(self, initLives):
+        for x in range(2*initLives+1):
+            if x != initLives:
+                widget = self.horizontalBox.itemAt(x).widget()
+            if x < initLives:
+                widget.setPixmap(QPixmap(IMAGES_DIR + 'player1.png').scaled(20, 30))
+            elif x > initLives:
+                widget.setPixmap(QPixmap(IMAGES_DIR + 'player2.png').scaled(20, 30))
 
     def initGuiElements(self, horizontalBox, verticalPlayerInf):
         self.getReadyLabel = QLabel()
@@ -251,7 +263,6 @@ class SimMoveDemo(QWidget):
     def splitBall(self, size, x, y):
         if size/2 <= MINBALLSIZE:
             if len(self.balls) == 0:
-                #loadNextLevel()
                 self.timer.stop()
                 time.sleep(1)
                 self.loadNextLevel()
@@ -335,9 +346,10 @@ class SimMoveDemo(QWidget):
                     self.bonuses.remove(bonus)
 
     def loadNextLevel(self):
+        self.key_notifier.keys.clear()
         self.currentLevel += 1
 
-        nextLevelType = random.choice([0,1])
+        nextLevelType = random.choice([0, 1])
 
         for bonus in self.bonuses:
             bonus.bonus.hide()
@@ -347,37 +359,35 @@ class SimMoveDemo(QWidget):
         if nextLevelType == 0:
             if self.startingBallSize*2 <= MAXBALLSIZE:
                 self.startingBallSize = self.startingBallSize*2
-                self.balls.append(Ball(self,self.startingBallSize))
+                self.balls.append(Ball(self, self.startingBallSize))
                 self.balls[0].ball.setPixmap(self.balls[0].pixMapScaled)
                 self.balls[0].ball.setGeometry(self.balls[0].x, self.balls[0].y, self.balls[0].size, self.balls[0].size)
                 self.balls[0].ball.show()
 
-                #self.currentAmp =  AMPLITUDE + 46
+                # self.currentAmp =  AMPLITUDE + 46
             else:
                 nextLevelType = 1
         if nextLevelType == 1:
             self.previousBalls = self.previousBalls + 1
             temp = self.previousBalls
             for x in range(self.previousBalls):
-                self.balls.append(Ball(self,self.startingBallSize))
+                self.balls.append(Ball(self, self.startingBallSize))
 
             for b in self.balls:
                 b.ball.setPixmap(b.pixMapScaled)
                 if self.currentBall % 2 == 0:
-                    b.x = b.x-35*(temp)
-                    temp+=1
+                    b.x = b.x - 35 * temp
+                    temp += 1
                     b.counter = b.x
                     b.ball.setGeometry(b.x, b.y, b.size, b.size)
                     b.forward = False
                 elif self.currentBall % 2 == 1:
-                    b.x = b.x+35*(temp)
-                    temp+=1
+                    b.x = b.x + 35 * temp
+                    temp += 1
                     b.counter = b.x
                     b.ball.setGeometry(b.x, b.y, b.size, b.size)
                 b.ball.show()
                 self.currentBall += 1
-
-            #self.currentAmp = self.currentAmp
 
         self.stopOnStart = True
 
@@ -389,6 +399,7 @@ class SimMoveDemo(QWidget):
                 player.weapon.isActive = False
                 player.weapon.update()
 
+        self.getReadyLabel.setText('Get ready!')
         self.getReadyLabel.show()
         self.getReadyLabel.raise_()
         self.levelNumTag.setText(str(self.currentLevel))
@@ -432,14 +443,62 @@ class SimMoveDemo(QWidget):
         time.sleep(1)
         self.currentAmp = AMPLITUDE
         self.stopOnStart = True
-        # if len(self.players) != 0:
-            # self.getReadyLabel.setText('Get ready!')
-        self.getReadyLabel.show()
-        self.getReadyLabel.raise_()
+
+        if not self.semiFinalEnd:
+            self.getReadyLabel.setText('Get ready!')
         if not self.finishCup:
             self.timer.start(20, self)
         else:
-            self.getReadyLabel.setText('Cup Finished!')
+            # gotov turnir, ispisi rezultate
+            self.cupScores()
+
+        self.getReadyLabel.show()
+        self.getReadyLabel.raise_()
+
+        self.semiFinalEnd = False
+
+    def getPlayersFromSemifinal1(self, ind):
+        points = self.deadPoints[ind].split('_')[0]
+        playerName = self.deadPoints[ind].split('_')[1]
+        semifinal1 = playerName + ' ' + points + '-' + self.deadPoints[ind+1].split('_')[0] + ' ' + \
+                     self.deadPoints[ind+1].split('_')[1]
+        return semifinal1
+
+    def cupScores(self):
+
+        # stringovi za ispis rezultata polufinala
+        semifinal1 = self.getPlayersFromSemifinal1(0)
+        semifinal2 = self.getPlayersFromSemifinal1(2)
+
+        f1points = self.deadPoints[4].split('_')[0]  # finalist 1 points from final
+        f1name = self.deadPoints[4].split('_')[1]  # finalist 1 name
+        f2points = self.deadPoints[5].split('_')[0]  # finalist 2 points from final
+        f2name = self.deadPoints[5].split('_')[1]  # finalist 2 name
+
+        # string za ispis rezultata finala
+        final = f1name + ' ' + f1points + '-' + f2points + ' ' + f2name
+
+        # ime pobjednika je u winner-u
+        winner = ''
+
+        if int(f1points) > int(f2points):
+            winner = f1name
+        elif int(f1points) == int(f2points):  # ako imaju isti broj poena u finalu neka pobijedi onaj koji je imao
+                                                    # vise u polufinalu, a ako opet imaju isto neka pobijedi domacin
+            if int(self.finalist1points) > int(self.finalist2points):  # prvi finalista je imao vise u polufinalu
+                winner = f1name
+            elif int(self.finalist1points) < int(self.finalist2points):  # drugi finalista je imao vise u polufinalu
+                winner = f2name
+            else:  # imali su isto poena i u polufinalu
+                if int(f1name[0]) < int(f2name[0]):
+                    winner = f1name
+                else:
+                    winner = f2name
+        else:
+            winner = f2name
+
+        self.getReadyLabel.setText(
+            'SF 1: ' + semifinal1 + '\nSF 2: ' + semifinal2 + '\nFINAL: ' + final + '\nWINNER: ' + winner)
 
     def updateLives(self):
         sender = self.sender()
@@ -462,15 +521,18 @@ class SimMoveDemo(QWidget):
         if sender.lifes == 0:
             sender.isDead = True
 
-
-
         if sender.isDead:
+            if sender.playerId == 'player1':
+                self.deadPoints.append(self.player1PointsTag.text() + '_' + self.player1Tag.text())
+            elif sender.playerId == 'player2':
+                self.deadPoints.append(self.player2PointsTag.text() + '_' + self.player2Tag.text())
             sender.player.hide()
             self.players.remove(sender)
 
         if len(self.players) == 0:
-            if self.endOfCup:
+            if self.finalGame:
                 self.finishCup = True
+
             p1points = int(self.player1PointsTag.text())
             p2points = int(self.player2PointsTag.text())
             if len(self.cupPlayers) == 0:
@@ -498,7 +560,7 @@ class SimMoveDemo(QWidget):
             previous = self.player2PointsTag.text()
             playerLabel = self.player2PointsTag
 
-        queueForCalcs.put(sender.playerId+','+str(previous)+','+str(num))
+        queueForCalcs.put(sender.playerId+','+ str(previous)+','+ str(num))
         points = str(queueForResults.get())
 
         playerLabel.setText(points)
@@ -506,64 +568,60 @@ class SimMoveDemo(QWidget):
     def gameOver(self):
         if not self.cupMode:
             self.getReadyLabel.setText("Game over")
-        else:
-            playerWon = self.cupPlayers[len(self.cupPlayers)-1]
-            self.getReadyLabel.setText(playerWon.split(',')[0].upper()+" WON!")
+            self.getReadyLabel.show()
+            self.getReadyLabel.raise_()
 
-        self.getReadyLabel.show()
-        self.getReadyLabel.raise_()
         self.timer.stop()
 
         if self.cupMode:
-            self.players = [Player(self, 'player1', 2), Player(self, 'player2', 2)]
+            self.playerWon = self.cupPlayers[len(self.cupPlayers) - 1]
+            self.getReadyLabel.setText(self.playerWon.split(',')[0].upper() + " WON!")
+            self.cupModeLogic()
 
-            label = self.player1Tag
-            self.player1PointsTag.setText('0')
-            self.player2PointsTag.setText('0')
-            x = 0
-            if len(self.cupPlayers) == 1:
-                for p in self.players:
-                    if p.playerId == 'player1':
-                        label.setText('3 PLAYER')
-                    elif p.playerId == 'player2':
-                        label.setText('4 PLAYER')
+    def cupModeLogic(self):
+        self.players = [Player(self, 'player1', 2), Player(self, 'player2', 2)]
 
-                    p.player.setPixmap(p.PixMap)
-                    if x == 0:
-                        p.weapon.weapon = self.weaponObj.weapon
-                    else:
-                        p.weapon.weapon = self.weaponObj2.weapon
-                    x += 1
-                    p.weapon.weapon.show()
-                    p.livesSignal.connect(self.updateLives)
-                    p.pointsSignal.connect(self.updatePoints)
+        self.initStartingLevel()
+        self.initCupPlayers()
 
-                    #p.show()
-                    p.player.show()
+        self.resetPlayerPixMapLives(self.players[0].lifes)
 
-                    label = self.player2Tag
+        if len(self.cupPlayers) == 1:  # pocelo drugo polufinale
+            self.getReadyLabel.setText(self.playerWon.split(',')[0].upper() + " WON!")
 
-            else: #finale
-                finalist1 = self.cupPlayers[0].split(',')[0]
-                finalist1points = self.cupPlayers[0].split(',')[1]
-                finalist2 = self.cupPlayers[1].split(',')[0]
-                finalist2points = self.cupPlayers[1].split(',')[1]
+            self.player1Tag.setText('3 PLAYER')
+            self.player2Tag.setText('4 PLAYER')
+        else:  # pocelo finale
+            finalist1 = self.cupPlayers[0].split(',')[0]
+            self.finalist1points = self.cupPlayers[0].split(',')[1]
+            finalist2 = self.cupPlayers[1].split(',')[0]
+            self.finalist2points = self.cupPlayers[1].split(',')[1]
 
-                self.player1Tag.setText(finalist1.upper())
-                self.player2Tag.setText(finalist2.upper())
-                x = 0
-                for p in self.players:
-                    p.player.setPixmap(p.PixMap)
-                    if x == 0:
-                        p.weapon.weapon = self.weaponObj.weapon
-                    else:
-                        p.weapon.weapon = self.weaponObj2.weapon
-                    x += 1
-                    p.weapon.weapon.show()
-                    p.livesSignal.connect(self.updateLives)
-                    p.pointsSignal.connect(self.updatePoints)
+            self.player1Tag.setText(finalist1.upper())
+            self.player2Tag.setText(finalist2.upper())
 
-                    # p.show()
-                    p.player.show()
-                self.endOfCup = True
-            self.resetLevel()
+            self.finalGame = True
+        self.resetLevel()
+
+    def initStartingLevel(self):  # vrati poene na 0, loptu na inicijalnu, level na 1
+        self.player1PointsTag.setText('0')
+        self.player2PointsTag.setText('0')
+        self.semiFinalEnd = True
+        self.currentLevel = 1
+        self.levelNumTag.setText(str(self.currentLevel))
+        self.previousBalls = 1
+        self.currentAmp = AMPLITUDE
+        self.startingBallSize = MINBALLSIZE * 2 + 1
+        self.semiFinalEnd = True
+
+    def initCupPlayers(self):
+        self.players[0].weapon.weapon = self.weaponObj.weapon
+        self.players[1].weapon.weapon = self.weaponObj2.weapon
+
+        for p in self.players:
+            p.player.setPixmap(p.PixMap)
+            p.weapon.weapon.show()
+            p.livesSignal.connect(self.updateLives)
+            p.pointsSignal.connect(self.updatePoints)
+
+            p.player.show()

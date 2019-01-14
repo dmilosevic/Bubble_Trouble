@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QApplication
-from PyQt5.QtCore import Qt, QBasicTimer, QRect, pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QWidget, QLabel
+from PyQt5.QtCore import Qt, QBasicTimer, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
 from Weapon import Weapon
@@ -42,7 +42,6 @@ class Player(QWidget):  # player1 or player2
         self.timer = QBasicTimer()
         self.timer.start(32, self)
 
-
         if self.noOfPlayers == 1:
             if self.playerId == 'player1':
                 self.PositionX = WINDOWWIDTH/2
@@ -51,7 +50,7 @@ class Player(QWidget):  # player1 or player2
         elif self.noOfPlayers == 2:
             if self.playerId == 'player1':
                 self.PositionX = 55
-                self.initialPositionX =  55
+                self.initialPositionX = 55
                 self.PositionY = PLAYER_HEIGTH
             elif self.playerId == 'player2':
                 self.PositionX = 700
@@ -66,7 +65,6 @@ class Player(QWidget):  # player1 or player2
                 self.counterBonus = 0
                 self.bonusNoWeapon = False
         self.weapon.update()
-        #self.displayWeapon = self.weapon.weapon
 
     def shoot(self):
         if not self.bonusNoWeapon:
@@ -129,9 +127,3 @@ class Player(QWidget):  # player1 or player2
             elif key == Qt.Key_Minus:
                 self.drawPlayer('normal')
                 self.player.setGeometry(self.initialPositionX, self.PositionY, self.Width, self.Heigth)
-
-    # def updateLives(self, num):
-    #     self.lifes -= num
-    #     if self.lifes == 0:
-    #         self.isDead = True
-

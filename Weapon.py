@@ -35,5 +35,5 @@ class Weapon(QWidget):
         else:
             self.weapon.setGeometry(0, 0, 0, 0)
             self.posY = self.parent.PositionY
-            self.taken =  False
+            self.taken = False
 

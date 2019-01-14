@@ -11,7 +11,7 @@ def pointsProcess(qCalcs: Queue, qRes: Queue):
     while True:
         if not qCalcs.empty():
             calc = str(qCalcs.get())
-            id = calc.split(',')[0]
+            # id = calc.split(',')[0]
             previous = calc.split(',')[1]
             points = calc.split(',')[2]
 
@@ -26,6 +26,7 @@ def livesProcess(qCalcs: Queue, qRes: Queue):
             ret = int(calc) - 1
 
             qRes.put(str(ret))
+
 
 class Menu(QMainWindow):
 
@@ -123,14 +124,13 @@ class Menu(QMainWindow):
     def mouseClickedQ(self, event):
         self.labelQuit.setStyleSheet(
             "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
-        #self.close()
+        # self.close()
         game = SimMoveDemo(self)
         game.menuSignal.emit(4)
         self.setCentralWidget(game)
         self.labelOnePlayer.hide()
         self.labelTwoPlayers.hide()
         self.labelQuit.hide()
-
 
     def mouseOverLabelQ(self, event):
         self.labelQuit.setStyleSheet(
