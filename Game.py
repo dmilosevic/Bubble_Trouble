@@ -49,6 +49,8 @@ class SimMoveDemo(QWidget):
         self.deadPoints = []
         self.finalist1points = 0
         self.finalist2points = 0
+        self.finalist1 = ''
+        self.finalist2 = ''
 
     def addPlayers(self, option):
         if option == 1:
@@ -149,7 +151,7 @@ class SimMoveDemo(QWidget):
         self.getReadyLabel.setStyleSheet(
             "QLabel{ background-color:rgba(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:solid;}")
 
-        self.player11LabelTxt = '1 PLAYER'
+        self.player11LabelTxt = 'PLAYER 1'
         self.player1Tag = QLabel()
         self.player1Tag.setText(self.player11LabelTxt)
         self.player1Tag.setFont(QFont('Denne Kitten Heels', 18, QFont.ExtraBold))
@@ -159,7 +161,7 @@ class SimMoveDemo(QWidget):
         self.player1Tag.setStyleSheet("QLabel{background-color: #CECECE; color:#E20000;}")
         self.player1Tag.setFixedSize(QSize(130, 31))
 
-        self.player2LabelTxt = '2 PLAYER'
+        self.player2LabelTxt = 'PLAYER 2'
         self.player2Tag = QLabel()
         self.player2Tag.setText(self.player2LabelTxt)
         self.player2Tag.setFont(QFont('Denne Kitten Heels', 18, QFont.ExtraBold))
@@ -486,11 +488,15 @@ class SimMoveDemo(QWidget):
         elif int(f1points) == int(f2points):  # ako imaju isti broj poena u finalu neka pobijedi onaj koji je imao
                                                     # vise u polufinalu, a ako opet imaju isto neka pobijedi domacin
             if int(self.finalist1points) > int(self.finalist2points):  # prvi finalista je imao vise u polufinalu
-                winner = f1name
+
+                winner = self.finalist1.upper()
+
             elif int(self.finalist1points) < int(self.finalist2points):  # drugi finalista je imao vise u polufinalu
-                winner = f2name
+
+                winner = self.finalist2.upper()
+
             else:  # imali su isto poena i u polufinalu
-                if int(f1name[0]) < int(f2name[0]):
+                if int(f1name[-1]) < int(f2name[-1]):
                     winner = f1name
                 else:
                     winner = f2name
@@ -537,14 +543,14 @@ class SimMoveDemo(QWidget):
             p2points = int(self.player2PointsTag.text())
             if len(self.cupPlayers) == 0:
                 if p1points >= p2points:
-                    self.cupPlayers.append('1 player,' + str(p1points))
+                    self.cupPlayers.append('player 1,' + str(p1points))
                 else:
-                    self.cupPlayers.append('2 player,' + str(p2points))
+                    self.cupPlayers.append('player 2,' + str(p2points))
             else:
                 if p1points >= p2points:
-                    self.cupPlayers.append('3 player,' + str(p1points))
+                    self.cupPlayers.append('player 3,' + str(p1points))
                 else:
-                    self.cupPlayers.append('4 player,' + str(p2points))
+                    self.cupPlayers.append('player 4,' + str(p2points))
             self.gameOver()
 
     def updatePoints(self, num):
@@ -589,16 +595,17 @@ class SimMoveDemo(QWidget):
         if len(self.cupPlayers) == 1:  # pocelo drugo polufinale
             self.getReadyLabel.setText(self.playerWon.split(',')[0].upper() + " WON!")
 
-            self.player1Tag.setText('3 PLAYER')
-            self.player2Tag.setText('4 PLAYER')
+            self.player1Tag.setText('PLAYER 3')
+            self.player2Tag.setText('PLAYER 4')
         else:  # pocelo finale
-            finalist1 = self.cupPlayers[0].split(',')[0]
+            self.finalist1 = self.cupPlayers[0].split(',')[0]
             self.finalist1points = self.cupPlayers[0].split(',')[1]
-            finalist2 = self.cupPlayers[1].split(',')[0]
+            self.finalist2 = self.cupPlayers[1].split(',')[0]
+
             self.finalist2points = self.cupPlayers[1].split(',')[1]
 
-            self.player1Tag.setText(finalist1.upper())
-            self.player2Tag.setText(finalist2.upper())
+            self.player1Tag.setText(self.finalist1.upper())
+            self.player2Tag.setText(self.finalist2.upper())
 
             self.finalGame = True
         self.resetLevel()
