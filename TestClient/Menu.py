@@ -8,9 +8,10 @@ import sys
 from multiprocessing import Process, Queue
 from os import path
 import sys
-sys.path.append(path.abspath('../Client'))
 
-from GUI import *
+sys.path.append(path.abspath(path.join(path.dirname(__file__), '..')))
+
+from Client.GUI import *
 
 def pointsProcess(qCalcs: Queue, qRes: Queue):
     while True:
@@ -92,13 +93,13 @@ class Menu(QMainWindow):
         label.setAlignment(Qt.AlignTop)
         label.setFrameStyle(1)
         label.setStyleSheet(
-            "QLabel{ background-color:rgb(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:none;}")
         label.setFixedSize(QSize(185, 35))
         return label
 
     def mouseClicked1P(self, event):
         self.labelOnePlayer.setStyleSheet(
-            "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
         process.start()
         processLives.start()
         game = SimMoveDemo(self)
@@ -111,15 +112,15 @@ class Menu(QMainWindow):
 
     def mouseOverLabel1P(self, event):
         self.labelOnePlayer.setStyleSheet(
-            "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#ffffff ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(66, 134, 244, 0.4) ;color:#ffffff ;border-width:1px; border-style:none;}")
 
     def mouseLeftLabel1P(self, event):
         self.labelOnePlayer.setStyleSheet(
-            "QLabel{ background-color:rgb(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:none;}")
 
     def mouseClicked2P(self, event):
         self.labelTwoPlayers.setStyleSheet(
-            "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
         process.start()
         processLives.start()
         game = SimMoveDemo(self)
@@ -132,15 +133,15 @@ class Menu(QMainWindow):
 
     def mouseOverLabel2P(self, event):
         self.labelTwoPlayers.setStyleSheet(
-            "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#ffffff ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(66, 134, 244, 0.4) ;color:#ffffff ;border-width:1px; border-style:none;}")
 
     def mouseLeftLabel2P(self, event):
         self.labelTwoPlayers.setStyleSheet(
-            "QLabel{ background-color:rgb(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:none;}")
 
     def mouseClickedQ(self, event):
         self.labelQuit.setStyleSheet(
-            "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
         #self.close()
         process.start()
         processLives.start()
@@ -156,15 +157,15 @@ class Menu(QMainWindow):
 
     def mouseOverLabelQ(self, event):
         self.labelQuit.setStyleSheet(
-            "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#ffffff ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(66, 134, 244, 0.4) ;color:#ffffff ;border-width:1px; border-style:none;}")
 
     def mouseLeftLabelQ(self, event):
         self.labelQuit.setStyleSheet(
-            "QLabel{ background-color:rgb(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:none;}")
 
     def mouseClickedOnline(self, event):
         self.labelOnlineGame.setStyleSheet(
-            "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(66, 134, 244, 0.4) ;color:#4286f4 ;border-width:1px; border-style:none;}")
         game = GUI(self)
         game.menuSignal.emit(3)
         self.setCentralWidget(game)
@@ -176,11 +177,11 @@ class Menu(QMainWindow):
 
     def mouseOverLabelOnline(self, event):
         self.labelOnlineGame.setStyleSheet(
-            "QLabel{ background-color:rgb(66, 134, 244, 0.4) ;color:#ffffff ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(66, 134, 244, 0.4) ;color:#ffffff ;border-width:1px; border-style:none;}")
 
     def mouseLeftLabelOnline(self, event):
         self.labelOnlineGame.setStyleSheet(
-            "QLabel{ background-color:rgb(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:none;}")
+            "QLabel{ background-color:rgba(81, 109, 131, 0.4) ;color:#D9C91B ;border-width:1px; border-style:none;}")
 
 
 if __name__ == '__main__':

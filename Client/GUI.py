@@ -1,8 +1,8 @@
 from PyQt5.QtCore import QSize, Qt, QBasicTimer, pyqtSignal
-from key_notifier1 import KeyNotifier
+from .key_notifier1 import KeyNotifier
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from Player1 import *
+from .Player1 import *
 from Client import *
 
 

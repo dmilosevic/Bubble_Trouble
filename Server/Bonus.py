@@ -1,4 +1,4 @@
-from Settings import *
+from Common.Settings import *
 
 
 class Bonus:

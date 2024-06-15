@@ -12,7 +12,7 @@ class Ball(QWidget):
         self.size = size
         self.ball = QLabel(parent)
         self.pixMap = QPixmap(IMAGES_DIR + 'bubble.png')
-        self.pixMapScaled = self.pixMap.scaled(size, size)
+        self.pixMapScaled = self.pixMap.scaled(int(size), int(size))
         self.counter = 400
         self.forward = True
         self.sinus = True
@@ -53,7 +53,7 @@ class Ball(QWidget):
                     self.splitedCounter = self.splitedCounter + BALL_STEP
 
         self.calculate_dy()
-        self.ball.setGeometry(self.counter, self.dy, self.size, self.size)
+        self.ball.setGeometry(int(self.counter), int(self.dy), int(self.size), int(self.size))
 
     def calculate_dy(self):
         if self.hit:

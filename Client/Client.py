@@ -8,7 +8,7 @@ queueClient = Queue()
 
 class Client(object):
     def __init__(self):
-        self.HOST = '192.168.101.250'#'192.168.101.248'
+        self.HOST = '192.168.0.18'#'192.168.101.248'
         self.PORT = 50000
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.HOST, self.PORT))

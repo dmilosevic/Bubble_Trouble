@@ -99,17 +99,17 @@ class Player(QWidget):  # player1 or player2
                 if self.PositionX + self.Width < WINDOWWIDTH-13:
                     self.drawPlayer('right')
                     self.PositionX += 5
-                    self.player.setGeometry(self.PositionX, self.PositionY, self.Width, self.Heigth)
+                    self.player.setGeometry(int(self.PositionX), int(self.PositionY), int(self.Width), int(self.Heigth))
 
             elif key == Qt.Key_Left:
                 if self.PositionX - 5 > 20:
                     self.drawPlayer('left')
                     self.PositionX -= 5
-                    self.player.setGeometry(self.PositionX, self.PositionY, self.Width, self.Heigth)
+                    self.player.setGeometry(int(self.PositionX), int(self.PositionY), int(self.Width), int(self.Heigth))
             elif key == Qt.Key_Minus:
                 self.drawPlayer('normal')
                 self.PositionX = self.initialPositionX
-                self.player.setGeometry(self.PositionX, self.PositionY, self.Width, self.Heigth)
+                self.player.setGeometry(int(self.PositionX), int(self.PositionY), int(self.Width), int(self.Heigth))
 
         elif self.playerId == 'player2':
             if key == Qt.Key_Shift:
@@ -118,12 +118,12 @@ class Player(QWidget):  # player1 or player2
                 if self.PositionX + self.Width < WINDOWWIDTH-13:
                     self.drawPlayer('right')
                     self.PositionX += 5
-                    self.player.setGeometry(self.PositionX, self.PositionY, self.Width, self.Heigth)
+                    self.player.setGeometry(int(self.PositionX), int(self.PositionY), int(self.Width), int(self.Heigth))
             elif key == Qt.Key_A:
                 if self.PositionX - 5 > 20:
                     self.drawPlayer('left')
                     self.PositionX -= 5
-                    self.player.setGeometry(self.PositionX, self.PositionY, self.Width, self.Heigth)
+                    self.player.setGeometry(int(self.PositionX), int(self.PositionY), int(self.Width), int(self.Heigth))
             elif key == Qt.Key_Minus:
                 self.drawPlayer('normal')
-                self.player.setGeometry(self.initialPositionX, self.PositionY, self.Width, self.Heigth)
+                self.player.setGeometry(int(self.initialPositionX), int(self.PositionY), int(self.Width), int(self.Heigth))

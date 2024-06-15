@@ -1,5 +1,6 @@
 from Common.ThreadRcv import *
 from Common.ThreadSend import *
+from Common.Settings import *
 from PyQt5.QtCore import QObject,Qt, QMutex, pyqtSignal, pyqtSlot
 from multiprocessing import Queue
 import socket
@@ -32,7 +33,7 @@ class Server(QObject):
         super().__init__()
 
         self.numberOfClients = 0
-        self.HOST = '192.168.101.250'#'192.168.0.67'
+        self.HOST = '192.168.0.18'#'192.168.0.67'
         self.PORT = 50000
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((self.HOST, self.PORT))

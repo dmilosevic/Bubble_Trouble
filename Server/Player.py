@@ -1,4 +1,4 @@
-from Settings import *
+from Common.Settings import *
 
 class Player:
     def __init__(self, Id, posX):

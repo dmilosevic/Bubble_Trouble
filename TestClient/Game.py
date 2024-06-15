@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, QSize, QBasicTimer, pyqtSignal
 from PyQt5.QtGui import QPalette, QBrush, QImage, QFont
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
-from key_notifier1 import KeyNotifier
+from key_notifier import KeyNotifier
 from Player import Player
 from Ball import Ball
 from Bonus import *
@@ -68,7 +68,7 @@ class SimMoveDemo(QWidget):
     def initPlayersAndBalls(self):
         for player in self.players:
             player.player.setPixmap(player.PixMap)
-            player.player.setGeometry(player.PositionX, player.PositionY, player.Width, player.Heigth)
+            player.player.setGeometry(int(player.PositionX), int(player.PositionY), int(player.Width), int(player.Heigth))
             player.weapon.weapon.setPixmap(player.weapon.PixMap)
             player.weapon.weapon.setGeometry(0, WINDOWHEIGHT-87, WINDOWWIDTH, 0)
             player.livesSignal.connect(self.updateLives)
@@ -78,7 +78,7 @@ class SimMoveDemo(QWidget):
             self.weaponObj2 = self.players[1].weapon
         for ball in self.balls:
             ball.ball.setPixmap(ball.pixMapScaled)
-            ball.ball.setGeometry(ball.x, ball.y, ball.size, ball.size)
+            ball.ball.setGeometry(int(ball.x), int(ball.y), int(ball.size), int(ball.size))
         for p in self.players:
             p.show()
 
@@ -257,7 +257,7 @@ class SimMoveDemo(QWidget):
         for bonus in self.bonuses:
             bonus.update()
             bonus.bonus.setPixmap(bonus.pixMapScaled)
-            bonus.bonus.setGeometry(bonus.posX, bonus.posY, 30, 30)
+            bonus.bonus.setGeometry(int(bonus.posX), int(bonus.posY), 30, 30)
             bonus.bonus.show()
         self.checkCollisionWeapon()
         self.checkCollisionPlayer()
@@ -299,7 +299,7 @@ class SimMoveDemo(QWidget):
         ball.dy = y
         ball.forward = isForward
         ball.ball.setPixmap(ball.pixMapScaled)
-        ball.ball.setGeometry(ball.counter, ball.dy, ball.size, ball.size)
+        ball.ball.setGeometry(int(ball.counter), int(ball.dy), int(ball.size), int(ball.size))
 
     def checkCollisionWeapon(self):
         for player in self.players:
@@ -363,7 +363,7 @@ class SimMoveDemo(QWidget):
                 self.startingBallSize = self.startingBallSize*2
                 self.balls.append(Ball(self, self.startingBallSize))
                 self.balls[0].ball.setPixmap(self.balls[0].pixMapScaled)
-                self.balls[0].ball.setGeometry(self.balls[0].x, self.balls[0].y, self.balls[0].size, self.balls[0].size)
+                self.balls[0].ball.setGeometry(int(self.balls[0].x), int(self.balls[0].y), int(self.balls[0].size), int(self.balls[0].size))
                 self.balls[0].ball.show()
 
                 # self.currentAmp =  AMPLITUDE + 46
@@ -381,13 +381,13 @@ class SimMoveDemo(QWidget):
                     b.x = b.x - 35 * temp
                     temp += 1
                     b.counter = b.x
-                    b.ball.setGeometry(b.x, b.y, b.size, b.size)
+                    b.ball.setGeometry(int(b.x), int(b.y), int(b.size), int(b.size))
                     b.forward = False
                 elif self.currentBall % 2 == 1:
                     b.x = b.x + 35 * temp
                     temp += 1
                     b.counter = b.x
-                    b.ball.setGeometry(b.x, b.y, b.size, b.size)
+                    b.ball.setGeometry(int(b.x), int(b.y), int(b.size), int(b.size))
                 b.ball.show()
                 self.currentBall += 1
 
@@ -427,11 +427,11 @@ class SimMoveDemo(QWidget):
                     self.balls[x].forward = False
                     self.balls[x].x = self.balls[x].x - 35*temp
                 self.balls[x].counter = self.balls[x].x
-                self.balls[x].ball.setGeometry(self.balls[x].x, self.balls[x].y, self.balls[x].size, self.balls[x].size)
+                self.balls[x].ball.setGeometry(int(self.balls[x].x), int(self.balls[x].y), int(self.balls[x].size), int(self.balls[x].size))
             elif x % 2 == 1:
                 self.balls[x].x = self.balls[x].x + 35*temp
                 self.balls[x].counter = self.balls[x].x
-                self.balls[x].ball.setGeometry(self.balls[x].x, self.balls[x].y, self.balls[x].size, self.balls[x].size)
+                self.balls[x].ball.setGeometry(int(self.balls[x].x), int(self.balls[x].y), int(self.balls[x].size), int(self.balls[x].size))
             self.balls[x].ball.show()
 
         for player in self.players:

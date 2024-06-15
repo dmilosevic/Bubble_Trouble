@@ -30,7 +30,7 @@ class Weapon(QWidget):
                 self.posY = self.parent.PositionY
                 self.weapon.setGeometry(0, 0, 0, 0)
             else:
-                self.weapon.setGeometry(self.posX, self.posY, 8, WINDOWHEIGHT)
+                self.weapon.setGeometry(int(self.posX), int(self.posY), 8, int(WINDOWHEIGHT))
                 self.posY -= WEAPON_SPEED
         else:
             self.weapon.setGeometry(0, 0, 0, 0)

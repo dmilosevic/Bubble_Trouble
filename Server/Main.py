@@ -1,7 +1,7 @@
 #from Server import queue, queueResponse, Server, w1X, w2X, Weapon1, Weapon2 #*
 from multiprocessing import Process
 import Server as s
-from ThreadRcv import *
+from Common.ThreadRcv import *
 from Common.Settings import *
 from PyQt5.QtCore import Qt, QBasicTimer
 import time
